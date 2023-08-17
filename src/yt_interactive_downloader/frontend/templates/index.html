@@ -27,11 +27,33 @@
             </form>
         </div>
         <div style="margin: 0; padding: 0; width: calc(100vw - 560px); height: 100vh;">
-            <form method="post" style="position: sticky;">
+            <form method="post" style="position: sticky; border: 2px dashed black;">
                 <input style="width: 300px;" type="search" name="query" placeholder="検索クエリ">
                 <input type="submit" value="search">
+                <div>
+                    <input style="width: 200px;" type="text" name="channelId" placeholder="channelId, optional">
+                </div>
+                <div>
+                    <span>#Max Results: </span>
+                    <input type="number" name="maxResuls" id="maxResuls" value="30" min="-1">
+                </div>
+                <div>
+                    <span>Order: </span>
+                    <input type="radio" name="order" id="unset" value="unset" checked>
+                    <label for="unset">unset</label>
+                    <input type="radio" name="order" id="date" value="date">
+                    <label for="date">date</label>
+                    <input type="radio" name="order" id="rating" value="rating">
+                    <label for="rating">rating</label>
+                    <input type="radio" name="order" id="relevance" value="relevance">
+                    <label for="relevance">relevance</label>
+                    <input type="radio" name="order" id="title" value="title">
+                    <label for="title">title</label>
+                    <input type="radio" name="order" id="view" value="view">
+                    <label for="view">viewCount</label>
+                </div>
             </form>
-            <div id="results" style="overflow: scroll; height: 90vh;">
+            <div id="results" style="overflow: scroll; height: 80vh;">
                 {% if status == "success" %}
                 {% for item in response["items"] %}
                 <div>

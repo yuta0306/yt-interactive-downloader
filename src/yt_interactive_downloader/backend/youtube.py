@@ -19,7 +19,7 @@ class YouTube:
         *,
         part: Literal["id", "snippet"] = "snippet",
         filter: Literal[
-            "forContentOwner", "forMine", "relatedToVideoId"
+            "forContentOwner", "forMine", "forDeveloper"
         ] = "forContentOwner",
         relatedToVideoId: str | None = None,
         channelId: str | None = None,

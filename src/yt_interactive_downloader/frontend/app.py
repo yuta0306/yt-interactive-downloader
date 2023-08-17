@@ -23,7 +23,21 @@ def index():
     path_to_download = os.environ.get("PATH_TO_DOWNLOAD", "")
     if request.method == "POST":
         query = request.form.get("query", "")
-        res, status_code = youtube.search(part="snippet", q=query, maxResults=30)
+        channel_id = request.form.get("channelId", "")
+        max_results = request.form.get("maxResults", 30)
+        order = request.form.get("order")
+        if order == "unset":
+            order = None
+        if channel_id == "":
+            channel_id = None
+
+        res, status_code = youtube.search(
+            part="snippet",
+            q=query,
+            channelId=channel_id,
+            maxResults=max_results,
+            order=order,
+        )
         if 200 <= status_code < 300:
             status = "success"
         else:

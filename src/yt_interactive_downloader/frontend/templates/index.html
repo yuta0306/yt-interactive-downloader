@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>yt-interactive-downloader</title>
+    <style>
+        td {
+            min-width: 120px;
+        }
+    </style>
+</head>
+
+<body style="margin: 0;padding: 0; height: 100vh; width: 100vw; overflow: hidden;">
+    <div style="display: flex; flex-direction: row; justify-content: center; align-items: center;">
+        <div style="width: 560px; height: 315px;">
+            <iframe id="video" width="560" height="315" src="https://www.youtube.com/embed/watch"
+                title="YouTube video player" frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen></iframe>
+            <form id="download" action="/download/" method="post">
+                <input style="width: 80%;" name="server" type="text" placeholder="external server" value="{{ server }}">
+                <input style="width: 80%;" name="path_to_download" type="text" placeholder="path_to_download"
+                    value="{{ path_to_download }}">
+                <button type="button" id="download-button">download</button>
+            </form>
+        </div>
+        <div style="margin: 0; padding: 0; width: calc(100vw - 560px); height: 100vh;">
+            <form method="post" style="position: sticky;">
+                <input style="width: 300px;" type="search" name="query" placeholder="検索クエリ">
+                <input type="submit" value="search">
+            </form>
+            <div id="results" style="overflow: scroll; height: 90vh;">
+                {% if status == "success" %}
+                {% for item in response["items"] %}
+                <div>
+                    <table>
+                        <tbody>
+                            {% if item["id"]["kind"] == "youtube#video" %}
+                            {% set videoId = item["id"]["videoId"] %}
+                            <tr data-videoId="{{ videoId }}" onmouseover="document.body.style.cursor = 'pointer'"
+                                onmouseleave="document.body.style.cursor = 'default'"
+                                onmousedown="document.getElementById('video').setAttribute('src', 'https://www.youtube.com/embed/{{ videoId }}'); document.getElementById('download').setAttribute('action', '/download/{{ videoId }}')">
+                                <td>動画ID</td>
+                                <td>{{ item["id"]["videoId"] }}</td>
+                            </tr>
+                            <tr>
+                                <td>タイトル</td>
+                                <td>{{ item["snippet"]["title"] }}</td>
+                            </tr>
+                            <tr>
+                                <td>概要</td>
+                                <td>{{ item["snippet"]["description"] }}</td>
+                            </tr>
+                            <tr>
+                                <td>チャンネル</td>
+                                <td>{{ item["snippet"]["channelTitle"] }}</td>
+                            </tr>
+                            {% elif item["id"]["kind"] == "youtube#channel" %}
+                            <tr>
+                                <td>チャンネルID</td>
+                                <td>{{ item["id"]["channelId"] }}</td>
+                            </tr>
+                            <tr>
+                                <td>チャンネル</td>
+                                <td>{{ item["snippet"]["title"] }}</td>
+                            </tr>
+                            <tr>
+                                <td>概要</td>
+                                <td>{{ item["snippet"]["description"] }}</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+                <hr>
+                {% endfor %}
+                {% elif status == "fail" %}
+                <p style="color: red;">検索結果の取得に失敗しました</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    </div>
+</body>
+
+<script>
+    document.getElementById("download-button").addEventListener("click", async (e) => {
+        event.stopPropagation();
+        event.preventDefault();
+        alert("ダウンロードを開始します")
+        const options = { method: 'POST', body: new FormData(document.getElementById('download')) };
+        const res = await fetch(document.getElementById('download').getAttribute('action'), options);
+        if (res.ok) alert("ダウンロードに成功しました")
+        else alert("ダウンロードに失敗しました")
+    })
+</script>
+
+</html>

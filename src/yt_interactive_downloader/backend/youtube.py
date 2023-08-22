@@ -352,7 +352,6 @@ class YouTube:
 
             res = requests.get(self.VIDEOS_ENDPOINT, params=params)
             res_dict = res.json()
-            print(res_dict)
             items.extend(res_dict["items"])
             if totalResults is None:
                 totalResults = int(res_dict["pageInfo"]["totalResutls"])

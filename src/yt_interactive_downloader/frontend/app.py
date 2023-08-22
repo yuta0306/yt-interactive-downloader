@@ -15,6 +15,17 @@ load_dotenv(".env")
 
 youtube = YouTube(key=os.environ.get("YOUTUBE_API"))
 
+TOPIC_IDS = {
+    "any": None,
+    "music": "/m/04rlf",
+    "game": "/m/0bzvm2",
+    "sport": "/m/06ntj",
+    "entertainment": "/m/02jjt",
+    "lifestyle": "/m/019_rr",
+    "social": "/m/098wr",
+    "knowledge": "/m/01k8wb",
+}
+
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -27,9 +38,11 @@ def index():
             session[key] = value
         query = request.form.get("query", "")
         channel_id = request.form.get("channelId", "")
+        topic = request.form.get("topic", "any")
         max_results = int(request.form.get("maxResults", 30))
         caption = request.form.get("caption", "any")
         order = request.form.get("order")
+        topic_id = TOPIC_IDS[topic]
         if order == "unset":
             order = None
         if channel_id == "":
@@ -37,12 +50,14 @@ def index():
 
         res, status_code = youtube.search(
             part="snippet",
+            filter="forDeveloper",
             q=query,
             channelId=channel_id,
             maxResults=max_results,
             order=order,
             videoCaption=caption,
             type="video",
+            topicId=topic_id,
         )
         if 200 <= status_code < 300:
             status = "success"
@@ -73,6 +88,11 @@ def download(videoId: str):
                 [
                     "yt-dlp",
                     f"https://www.youtube.com/watch?v={videoId}",
+                    "--sub-langs",
+                    "ja",
+                    "--embed-subs",
+                    "--embed-thumbnail",
+                    "--embed-metadata",
                     "-f",
                     "mp4",
                     "-o",

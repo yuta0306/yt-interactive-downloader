@@ -44,6 +44,57 @@
                     {% endif %}
                 </div>
                 <div>
+                    <span>Parent Topic: </span>
+                    {% if history.get("topic") is none or history["topic"] == "any" %}
+                    <input type="radio" name="topic" id="any" value="any" checked>
+                    {% else %}
+                    <input type="radio" name="topic" id="any" value="any">
+                    {% endif %}
+                    <label for="any">any</label>
+                    {% if history["topic"] == "music" %}
+                    <input type="radio" name="topic" id="music" value="music" checked>
+                    {% else %}
+                    <input type="radio" name="topic" id="music" value="music">
+                    {% endif %}
+                    <label for="music">music</label>
+                    {% if history["topic"] == "game" %}
+                    <input type="radio" name="topic" id="game" value="game" checked>
+                    {% else %}
+                    <input type="radio" name="topic" id="game" value="game">
+                    {% endif %}
+                    <label for="game">game</label>
+                    {% if history["topic"] == "sport" %}
+                    <input type="radio" name="topic" id="sport" value="sport" checked>
+                    {% else %}
+                    <input type="radio" name="topic" id="sport" value="sport">
+                    {% endif %}
+                    <label for="sport">sport</label>
+                    {% if history["topic"] == "entertainment" %}
+                    <input type="radio" name="topic" id="entertainment" value="entertainment" checked>
+                    {% else %}
+                    <input type="radio" name="topic" id="entertainment" value="entertainment">
+                    {% endif %}
+                    <label for="entertainment">entertainment</label>
+                    {% if history["topic"] == "lifestyle" %}
+                    <input type="radio" name="topic" id="lifestyle" value="lifestyle" checked>
+                    {% else %}
+                    <input type="radio" name="topic" id="lifestyle" value="lifestyle">
+                    {% endif %}
+                    <label for="lifestyle">lifestyle</label>
+                    {% if history["topic"] == "social" %}
+                    <input type="radio" name="topic" id="social" value="social" checked>
+                    {% else %}
+                    <input type="radio" name="topic" id="social" value="social">
+                    {% endif %}
+                    <label for="social">social</label>
+                    {% if history["topic"] == "knowledge" %}
+                    <input type="radio" name="topic" id="knowledge" value="knowledge" checked>
+                    {% else %}
+                    <input type="radio" name="topic" id="knowledge" value="knowledge">
+                    {% endif %}
+                    <label for="knowledge">knowledge</label>
+                </div>
+                <div>
                     <span>#Max Results: </span>
                     {% if history %}
                     <input type="number" name="maxResults" id="maxResults" value="{{ history['maxResults'] }}" min="-1">
@@ -112,7 +163,7 @@
                     <label for="none">none</label>
                 </div>
             </form>
-            <div id="results" style="overflow: scroll; height: 80vh;">
+            <div id="results" style="overflow: scroll; height: 75vh;">
                 {% if status == "success" %}
                 {% for item in response["items"] %}
                 <div>

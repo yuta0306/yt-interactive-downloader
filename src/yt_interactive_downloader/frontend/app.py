@@ -4,11 +4,12 @@ import subprocess
 from pathlib import Path
 
 from dotenv.main import load_dotenv
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, render_template, request, session
 
 from src.yt_interactive_downloader.backend import YouTube
 
 app = Flask(__name__)
+app.secret_key = "secret!"
 
 load_dotenv(".env")
 
@@ -22,9 +23,12 @@ def index():
     server = os.environ.get("EXTERNAL_SERVER", "")
     path_to_download = os.environ.get("PATH_TO_DOWNLOAD", "")
     if request.method == "POST":
+        for key, value in request.form.items():
+            session[key] = value
         query = request.form.get("query", "")
         channel_id = request.form.get("channelId", "")
-        max_results = request.form.get("maxResults", 30)
+        max_results = int(request.form.get("maxResults", 30))
+        caption = request.form.get("caption", "any")
         order = request.form.get("order")
         if order == "unset":
             order = None
@@ -37,6 +41,8 @@ def index():
             channelId=channel_id,
             maxResults=max_results,
             order=order,
+            videoCaption=caption,
+            type="video",
         )
         if 200 <= status_code < 300:
             status = "success"
@@ -49,6 +55,7 @@ def index():
         response=res,
         server=server,
         path_to_download=path_to_download,
+        history=session,
     )
 
 

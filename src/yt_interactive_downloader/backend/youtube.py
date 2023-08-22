@@ -10,6 +10,7 @@ class YouTube:
     PLAYLISTITEMS_ENDPOINT: Final[
         str
     ] = "https://www.googleapis.com/youtube/v3/playlistItems"
+    VIDEOS_ENDPOINT: Final[str] = "https://www.googleapis.com/youtube/v3/videos"
 
     def __init__(self, key: str) -> None:
         self.__key = key
@@ -21,7 +22,7 @@ class YouTube:
         filter: Literal[
             "forContentOwner", "forMine", "forDeveloper"
         ] = "forContentOwner",
-        relatedToVideoId: str | None = None,
+        relatedToVideoId: str | None = None,  # deprecated
         channelId: str | None = None,
         channelType: str | None = None,
         maxResults: int = 5,
@@ -178,6 +179,7 @@ class YouTube:
             - episode – 番組のエピソードのみを取得します。
             - movie – 動画のみを取得します。
         """
+        assert relatedToVideoId is None, "`relatedToVideoId` is deprecated"
         max_iter = 1
         if maxResults <= 0:
             max_iter = 10000
@@ -193,7 +195,7 @@ class YouTube:
                 "key": self.__key,
                 "part": part,
                 "filter": filter,
-                "relatedToVideoId": relatedToVideoId,
+                # "relatedToVideoId": relatedToVideoId,  # deprecated
                 "channelId": channelId,
                 "channelType": channelType,
                 "maxResults": maxResults,
@@ -295,6 +297,66 @@ class YouTube:
             if totalResults is None:
                 totalResults = int(res_dict["pageInfo"]["totalResults"])
                 print("TotalResults:", totalResults)
+            pageToken = res_dict.get("nextPageToken")
+            if pageToken is None:
+                break
+            time.sleep(time_sleep)
+        res_dict["items"] = items
+        print("Fetched Results:", len(items))
+        return res_dict, res.status_code
+
+    def fetch_videos(
+        self,
+        part: str = "snippet",
+        chart: Literal["mostPopular"] | None = None,
+        id: str | None = None,
+        myRating: Literal["dislike", "like"] | None = None,
+        hl: str | None = None,
+        maxHeight: int | None = None,
+        maxResults: int = 5,
+        maxWidth: int | None = None,
+        onBehalfOfContentOwner: str | None = None,
+        pageToken: str | None = None,
+        regionCode: str | None = None,
+        videoCategoryId: str | None = None,
+        time_sleep: float = 0.5,
+    ) -> tuple[dict[str, Any], int]:
+        max_iter = 1
+        if maxResults <= 0:
+            max_iter = 10000
+            maxResults = 50
+        if maxResults > 50:
+            max_iter = maxResults // 50
+            maxResults = 50
+
+        totalResults = None
+        items = []
+        for _ in tqdm(range(max_iter)):
+            params = {
+                "part": part,
+                "hl": hl,
+                "maxHeight": maxHeight,
+                "maxResults": maxResults,
+                "maxWidth": maxWidth,
+                "onBehalfOfContentOwner": onBehalfOfContentOwner,
+                "pageToken": pageToken,
+                "regionCode": regionCode,
+                "videoCategoryId": videoCategoryId,
+            }
+            if chart is not None:
+                params["chart"] = chart
+            if id is not None:
+                params["id"] = id
+            if myRating is not None:
+                params["myRating"] = myRating
+
+            res = requests.get(self.VIDEOS_ENDPOINT, params=params)
+            res_dict = res.json()
+            print(res_dict)
+            items.extend(res_dict["items"])
+            if totalResults is None:
+                totalResults = int(res_dict["pageInfo"]["totalResutls"])
+                print("TotalResutls:", totalResults)
             pageToken = res_dict.get("nextPageToken")
             if pageToken is None:
                 break

@@ -35,4 +35,4 @@ dev-dependencies = [
 allow-direct-references = true
 
 [tool.rye.scripts]
-run = { call = "src.yt_interactive_downloader.frontend.app:run" } 
+app = { call = "src.yt_interactive_downloader.frontend.app:run" } 

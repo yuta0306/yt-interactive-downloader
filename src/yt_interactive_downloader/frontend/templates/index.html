@@ -101,6 +101,20 @@
                     {% else %}
                     <input type="number" name="maxResults" id="maxResults" value="30" min="-1">
                     {% endif %}
+                    <span>Date Range: </span>
+                    {% if history %}
+                    <input type="date" name="publishedAfter" id="publishedAfter"
+                        value="{{ history['publishedAfter'] }}">
+                    {% else %}
+                    <input type="date" name="publishedAfter" id="publishedAfter">
+                    {% endif %}
+                    <span> ~ </span>
+                    {% if history %}
+                    <input type="date" name="publishedBefore" id="publishedBefore"
+                        value="{{ history['publishedBefore'] }}">
+                    {% else %}
+                    <input type="date" name="publishedBefore" id="publishedBefore">
+                    {% endif %}
                 </div>
                 <div>
                     <span>Order: </span>
@@ -184,6 +198,10 @@
                             <tr>
                                 <td>概要</td>
                                 <td>{{ item["snippet"]["description"] }}</td>
+                            </tr>
+                            <tr>
+                                <td>公開日</td>
+                                <td>{{ item["snippet"]["publishTime"] | display_time }}</td>
                             </tr>
                             <tr>
                                 <td>チャンネル</td>

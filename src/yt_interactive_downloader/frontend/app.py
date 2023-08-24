@@ -1,4 +1,5 @@
 import os
+import re
 import shutil
 import subprocess
 from pathlib import Path
@@ -13,6 +14,7 @@ app.secret_key = "secret!"
 
 load_dotenv(".env")
 
+
 youtube = YouTube(key=os.environ.get("YOUTUBE_API"))
 
 TOPIC_IDS = {
@@ -25,6 +27,11 @@ TOPIC_IDS = {
     "social": "/m/098wr",
     "knowledge": "/m/01k8wb",
 }
+
+
+@app.template_filter()
+def display_time(string: str) -> str:
+    return re.sub(r"T.+", "", string)
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -42,11 +49,21 @@ def index():
         max_results = int(request.form.get("maxResults", 30))
         caption = request.form.get("caption", "any")
         order = request.form.get("order")
+        publishedAfter = request.form.get("publishedAfter", "")
+        publishedBefore = request.form.get("publishedBefore", "")
         topic_id = TOPIC_IDS[topic]
         if order == "unset":
             order = None
         if channel_id == "":
             channel_id = None
+        if publishedAfter == "":
+            publishedAfter = None
+        else:
+            publishedAfter += "T00:00:00Z"
+        if publishedBefore == "":
+            publishedBefore = None
+        else:
+            publishedBefore += "T00:00:00Z"
 
         res, status_code = youtube.search(
             part="snippet",
@@ -58,6 +75,9 @@ def index():
             videoCaption=caption,
             type="video",
             topicId=topic_id,
+            relevanceLanguage="ja",
+            publishedAfter=publishedAfter,
+            publishedBefore=publishedBefore,
         )
         if 200 <= status_code < 300:
             status = "success"
